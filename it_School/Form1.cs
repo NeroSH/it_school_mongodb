@@ -18,159 +18,9 @@ namespace it_School
         {
             InitializeComponent();
         }
-
-        //private static async Task Find(IMongoCollection<BsonDocument> collection)
-        //{
-        //    //var filter = DBConnection.Classroom;
-        //    var people = await collection.Find(DBConnection.Classroom).ToListAsync();
-        //    foreach (var p in people)
-        //    {
-        //        Console.WriteLine(p);
-        //    }
-        //}
-
-        //private static async Task<bool> UpdateProductsAsync()
-        //{
-        //    // Create client connection to our MongoDB database
-        //    var client = new MongoClient(MongoDBConnectionString);
-        //    BsonDocument stun = new BsonDocument({ 
-        //        "name",
-        //        ""
-        //    });
-        //    // Create the collection object that represents the "products" collection
-        //    var database = client.GetDatabase("MongoDBStore");
-        //    var products = database.GetCollection<Product>("products");
-
-        //    // Clean up the collection if there is data in there
-        //    await database.DropCollectionAsync("products");
-
-        //    // collections can't be created inside a transaction so create it first
-        //    await database.CreateCollectionAsync("products");
-
-        //    // Create a session object that is used when leveraging transactions
-        //    using (var session = await client.StartSessionAsync())
-        //    {
-        //        // Begin transaction
-        //        session.StartTransaction();
-
-        //        try
-        //        {
-        //            // Create some sample data
-        //            var tv = new Product
-        //            {
-        //                Description = "Television",
-        //                SKU = 4001,
-        //                Price = 2000
-        //            };
-        //            var book = new Product
-        //            {
-        //                Description = "A funny book",
-        //                SKU = 43221,
-        //                Price = 19.99
-        //            };
-        //            var dogBowl = new Product
-        //            {
-        //                Description = "Bowl for Fido",
-        //                SKU = 123,
-        //                Price = 40.00
-        //            };
-
-        //            // Insert the sample data 
-        //            await products.InsertOneAsync(session, tv);
-        //            await products.InsertOneAsync(session, book);
-        //            await products.InsertOneAsync(session, dogBowl);
-
-        //            var resultsBeforeUpdates = await products
-        //                          .Find<Product>(session, Builders<Product>.Filter.Empty)
-        //                          .ToListAsync();
-        //            Console.WriteLine("Original Prices:\n");
-        //            foreach (Product d in resultsBeforeUpdates)
-        //            {
-        //                Console.WriteLine(
-        //                          String.Format("Product Name: {0}\tPrice: {1:0.00}",
-        //                                d.Description, d.Price)
-        //                );
-        //            }
-
-        //            // Increase all the prices by 10% for all products
-        //            var update = new UpdateDefinitionBuilder<Product>()
-        //                   .Mul<Double>(r => r.Price, 1.1);
-        //            await products.UpdateManyAsync(session,
-        //                   Builders<Product>.Filter.Empty,
-        //                   update); //,options);
-
-        //            // Made it here without error? Let's commit the transaction
-        //            await session.CommitTransactionAsync();
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            Console.WriteLine("Error writing to MongoDB: " + e.Message);
-        //            await session.AbortTransactionAsync();
-        //            return false;
-        //        }
-
-        //        // Let's print the new results to the console
-        //        Console.WriteLine("\n\nNew Prices (10% increase):\n");
-        //        var resultsAfterCommit = await products
-        //               .Find<Product>(session, Builders<Product>.Filter.Empty)
-        //               .ToListAsync();
-        //        foreach (Product d in resultsAfterCommit)
-        //        {
-        //            Console.WriteLine(
-        //                String.Format("Product Name: {0}\tPrice: {1:0.00}",
-        //                                         d.Description, d.Price)
-        //            );
-        //        }
-
-        //        return true;
-        //    }
-        //}
-
-        private async void MainForm_Load(object sender, EventArgs e)
-        {
-            //var collections = new JavaScriptSerializer();
-            //ta
-            //tabs.Serialize();
-            //var data = collections.SelectMany(pair => ((object[])pair.Value));
-
-            //var dt = new DataTable();
-
-            //dt.Columns.Add(tabs[0].ToString(), typeof(string)).ReadOnly = true;
-            //FindPeople().GetAwaiter().GetResult();
-            var stream1 = new MemoryStream();
-            stream1.Position = 0;
-            //var p2 = (Student)new DataContractJsonSerializer(typeof(Student)).ReadObject(DBConnection.Classroom);
-            //List<Student> tab = BsonSerializer.Deserialize<List<Student>>(DBConnection.Students.Watch());
-            var st = DBConnection.Students.DocumentSerializer;
-            //    var sr = new StreamReader(stream1);
-            //List<string> collections = new List<string>();
-            int it = 0;
-            dataGridView1.ColumnCount = 10;
-            List<BsonDocument> tables = new List<BsonDocument>();
-            foreach (BsonDocument collection in DBConnection.School.ListCollectionsAsync().Result.ToListAsync<BsonDocument>().Result)
-            {
-                tables.Add(collection);
-                string name = collection["name"].AsString;
-                dataGridView1.Columns[it++].Name = name;
-            }
-            //var t = DBConnection.School.GetCollection<Student>("student");//.Find(FilterDefinition<BsonDocument>.Empty);
-            
-            //for (int j = 0; j < 10; j++)
-            //{
-            //    dataGridView1.Columns[j].Name = collections[j];
-            //}
-            //string tab = "classroom";
-            //var filter = DBConnection.Classroom;
-            ////var rows = new List<BsonElement>(tables);
-            //foreach (BsonDocument data in DBConnection.School.GetCollection<BsonDocument>(tab).Find())
-            //{
-            //    int n = 50;
-            //    //string name = data["name"].AsString;
-            //    //collections.Add(name);
-            //}
-
-        }
-
+        //
+        // Методы для отображения элементов таблиц
+        //
         private async void DisplayClassroom()
         {
                 DataTable data = new DataTable();
@@ -301,21 +151,161 @@ namespace it_School
                 dataGridView2.DataSource = data;
             }
         }
-        private void search_button_Click(object sender, EventArgs e)
-        {
 
+        private async void DisplayTeachers()
+        {
+            DataTable data = new DataTable();
+            var filter = new BsonDocument();
+            int count = 0;
+            using (var cursor = await DBConnection.Teachers.FindAsync(filter))
+            {
+                while (await cursor.MoveNextAsync())
+                {
+                    var document = cursor.Current;
+
+                    data.Columns.Add("fid_staff", typeof(int));
+                    data.Columns.Add("fid_group", typeof(int));
+
+                    foreach (var item in document)
+                    {
+                        data.Rows.Add(item["fid_staff"],
+                            item["fid_group"]);
+                    }
+                    count++;
+                }
+                dataGridView2.DataSource = data;
+            }
         }
 
-        private void update_button_Click(object sender, EventArgs e)
+        private async void DisplayContract()
         {
+            DataTable data = new DataTable();
+            var filter = new BsonDocument();
+            int count = 0;
+            using (var cursor = await DBConnection.Contract.FindAsync(filter))
+            {
+                while (await cursor.MoveNextAsync())
+                {
+                    var document = cursor.Current;
 
+                    data.Columns.Add("pid_contract", typeof(int));
+                    data.Columns.Add("date_of_creation", typeof(DateTime));
+                    data.Columns.Add("monetary_condition", typeof(decimal));
+                    data.Columns.Add("type", typeof(string));
+                    data.Columns.Add("fid_group", typeof(int));
+                    data.Columns.Add("fid_student", typeof(int));
+                    data.Columns.Add("id_major", typeof(int));
+                    data.Columns.Add("duties", typeof(string));
+
+                    foreach (var item in document)
+                    {
+                        data.Rows.Add(
+                            item["pid_contract"],
+                            item["date_of_creation"],
+                            item["monetary_condition"],
+                            item["type"],
+                            item["fid_group"],
+                            item["fid_student"],
+                            item["id_major"],
+                            item["duties"]);
+                    }
+                    count++;
+                }
+                dataGridView2.DataSource = data;
+            }
         }
 
-        private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private async void DisplayStudent()
         {
+            DataTable data = new DataTable();
+            var filter = new BsonDocument();
+            int count = 0;
+            using (var cursor = await DBConnection.Students.FindAsync(filter))
+            {
+                while (await cursor.MoveNextAsync())
+                {
+                    var document = cursor.Current;
 
+                    data.Columns.Add("pid_student", typeof(int));
+                    data.Columns.Add("s_surname", typeof(string));
+                    data.Columns.Add("s_name", typeof(string));
+                    data.Columns.Add("s_patronymic", typeof(string));
+                    data.Columns.Add("phone_number", typeof(decimal));
+                    data.Columns.Add("date_of_birth", typeof(DateTime));
+                    data.Columns.Add("description", typeof(string));
+                    data.Columns.Add("gender", typeof(string));
+                    data.Columns.Add("pc", typeof(bool));
+                    data.Columns.Add("payment", typeof(bool));
+
+                    foreach (var item in document)
+                    {
+                        data.Rows.Add(
+                            item["pid_student"],
+                            item["s_surname"],
+                            item["s_name"],
+                            item["s_patronymic"],
+                            item["phone_number"],
+                            item["date_of_birth"],
+                            item["description"],
+                            item["gender"],
+                            item["pc"],
+                            item["payment"]);
+                    }
+                    count++;
+                }
+                dataGridView2.DataSource = data;
+            }
         }
 
+        private async void DisplayParents()
+        {
+            DataTable data = new DataTable();
+            var filter = new BsonDocument();
+            int count = 0;
+            using (var cursor = await DBConnection.Parents.FindAsync(filter))
+            {
+                while (await cursor.MoveNextAsync())
+                {
+                    var document = cursor.Current;
+
+                    data.Columns.Add("fid_student", typeof(int));
+                    data.Columns.Add("p_surname", typeof(string));
+                    data.Columns.Add("p_name", typeof(string));
+                    data.Columns.Add("p_patronymic", typeof(string));
+                    data.Columns.Add("phone_number", typeof(decimal));
+                    data.Columns.Add("address", typeof(string));
+
+                    foreach (var item in document)
+                    {
+                        data.Rows.Add(
+                            item["fid_student"],
+                            item["p_surname"],
+                            item["p_name"],
+                            item["p_patronymic"],
+                            item["phone_number"],
+                            item["address"]);
+                    }
+                    count++;
+                }
+                dataGridView2.DataSource = data;
+            }
+        }
+        
+        //Действия при открытии окна
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            int it = 0;
+            dataGridView1.ColumnCount = 10;
+            //достаём названия таблиц из базы данных School
+            foreach (BsonDocument collection in DBConnection.School.ListCollectionsAsync().Result.ToListAsync<BsonDocument>().Result)
+            {
+                string name = collection["name"].AsString;
+                dataGridView1.Columns[it++].Name = name;
+            }
+        }
+
+        //После нажания на название таблицы, вызываются функция заполнения таблицы данных
+        //соответствующая названию таблицы
         private void dataGridView1_MouseDown(object sender, MouseEventArgs e)
         {
             try
@@ -326,8 +316,10 @@ namespace it_School
                     string tab = dataGridView1.Columns[ht.ColumnIndex].HeaderText;
                     switch (tab)
                     {
+                        //Если выбрана таблица "classroom" в верхней таблице
                         case "classroom":
                             {
+                                //то вызывается функция заполнения нижней таблицы данных
                                 DisplayClassroom();
                                 break;
                             }
@@ -346,26 +338,26 @@ namespace it_School
                                 DisplayCurriculum();
                                 break;
                             }
-                        //case "teacheers":
-                        //    {
-                        //        DisplayTeachers();
-                        //        break;
-                        //    }
-                        //case "contract":
-                        //    {
-                        //        DisplayContcract();
-                        //        break;
-                        //    }
-                        //case "student":
-                        //    {
-                        //        DisplayStudent();
-                        //        break;
-                        //    }
-                        //case "parents":
-                        //    {
-                        //        DisplayParents();
-                        //        break;
-                        //    }
+                        case "teachers":
+                            {
+                                DisplayTeachers();
+                                break;
+                            }
+                        case "contract":
+                            {
+                                DisplayContract();
+                                break;
+                            }
+                        case "student":
+                            {
+                                DisplayStudent();
+                                break;
+                            }
+                        case "parents":
+                            {
+                                DisplayParents();
+                                break;
+                            }
                         //case "equipement":
                         //    {
                         //        DisplayEquipement();
@@ -386,12 +378,26 @@ namespace it_School
                 MessageBox.Show("Display Data Error: " + ex);
             }
         }
+        private void search_button_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void update_button_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
            
         }
-
+        //INSERT пока не работает
         private void insert_button_Click(object sender, EventArgs e)
         {
             var student = new Student();

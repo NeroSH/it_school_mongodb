@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 
 namespace it_School
 {
-    
+    //Класс для операций INSERT и UPDATE
     class Student
     {
         //[BsonId]
