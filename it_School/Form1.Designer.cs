@@ -54,13 +54,15 @@
             // 
             // dataGridView2
             // 
-            this.dataGridView2.AllowUserToAddRows = false;
-            this.dataGridView2.AllowUserToDeleteRows = false;
+            this.dataGridView2.AllowUserToAddRows = true;
+            this.dataGridView2.AllowUserToDeleteRows = true;
             this.dataGridView2.AllowUserToResizeColumns = false;
             this.dataGridView2.AllowUserToResizeRows = false;
             this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView2.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnKeystrokeOrF2;
             this.dataGridView2.Location = new System.Drawing.Point(12, 61);
             this.dataGridView2.Name = "dataGridView2";
+            this.dataGridView2.ReadOnly = false;
             this.dataGridView2.RowHeadersWidth = 51;
             this.dataGridView2.RowTemplate.Height = 50;
             this.dataGridView2.Size = new System.Drawing.Size(1078, 557);

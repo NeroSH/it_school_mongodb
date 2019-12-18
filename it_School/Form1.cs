@@ -14,6 +14,8 @@ namespace it_School
 {
     public partial class MainForm : Form
     {
+        private string tab;
+
         public MainForm()
         {
             InitializeComponent();
@@ -290,7 +292,246 @@ namespace it_School
                 dataGridView2.DataSource = data;
             }
         }
+
+        private async void DisplayEquipement()
+        {
+            DataTable data = new DataTable();
+            var filter = new BsonDocument();
+            int count = 0;
+            using (var cursor = await DBConnection.Equipement.FindAsync(filter))
+            {
+                while (await cursor.MoveNextAsync())
+                {
+                    var document = cursor.Current;
+
+                    data.Columns.Add("pid_inventory", typeof(int));
+                    data.Columns.Add("fid_classroom", typeof(int));
+                    data.Columns.Add("e_name", typeof(string));
+                    data.Columns.Add("quantity", typeof(int));
+
+                    foreach (var item in document)
+                    {
+                        data.Rows.Add(item["pid_inventory"],
+                            item["fid_classroom"],
+                            item["e_name"],
+                            item["quantity"]);
+                    }
+                    count++;
+                }
+                dataGridView2.DataSource = data;
+            }
+        }
+        private async void DisplaySchool()
+        {
+            DataTable data = new DataTable();
+            var filter = new BsonDocument();
+            int count = 0;
+            using (var cursor = await DBConnection.Campus.FindAsync(filter))
+            {
+                while (await cursor.MoveNextAsync())
+                {
+                    var document = cursor.Current;
+
+                    data.Columns.Add("pid_school", typeof(int));
+                    data.Columns.Add("name", typeof(string));
+                    data.Columns.Add("address", typeof(string));
+
+                    foreach (var item in document)
+                    {
+                        data.Rows.Add(item["pid_school"],
+                            item["name"],
+                            item["address"]);
+                    }
+                    count++;
+                }
+                dataGridView2.DataSource = data;
+            }
+        }
+
+        //Добавление документов в таблицу
+        private BsonDocument GetNewClassroom()
+        {
+            return new BsonDocument
+            {
+                {"pid_classroom",    int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())},
+                {"fid_school",       int.Parse(dataGridView2.CurrentRow.Cells[1].Value.ToString())}
+            };
+        }
+        private BsonDocument GetNewContract()
+        {
+            return new BsonDocument
+            {
+                {"pid_contract",    int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())},
+                {"date_of_creation",    DateTime.Parse(dataGridView2.CurrentRow.Cells[1].Value.ToString())},
+                {"monetary_condition",  decimal.Parse(dataGridView2.CurrentRow.Cells[2].Value.ToString())},
+                {"type",            dataGridView2.CurrentRow.Cells[3].Value.ToString()},
+                {"fid_group",       int.Parse(dataGridView2.CurrentRow.Cells[4].Value.ToString())},
+                {"fid_student",     int.Parse(dataGridView2.CurrentRow.Cells[5].Value.ToString())},
+                {"id_major",        int.Parse(dataGridView2.CurrentRow.Cells[6].Value.ToString())},
+                {"duties",          dataGridView2.CurrentRow.Cells[7].Value.ToString()}
+            };
+        }
+        private BsonDocument GetNewCurriculum()
+        {
+            return new BsonDocument
+            {
+                {"pid_major",       int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())},
+                {"year_of_study",   int.Parse(dataGridView2.CurrentRow.Cells[1].Value.ToString())},
+                {"subjects",        dataGridView2.CurrentRow.Cells[2].Value.ToString()},
+                {"duration",        decimal.Parse(dataGridView2.CurrentRow.Cells[3].Value.ToString())},
+            };
+        }
+        private BsonDocument GetNewEquipement()
+        {
+            return new BsonDocument
+            {
+                {"pid_inventory",   int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())},
+                {"fid_classroom",   int.Parse(dataGridView2.CurrentRow.Cells[1].Value.ToString())},
+                {"e_name",          dataGridView2.CurrentRow.Cells[2].Value.ToString()},
+                {"quantity",        int.Parse(dataGridView2.CurrentRow.Cells[3].Value.ToString())}
+            };
+        }
+        private BsonDocument GetNewGroup()
+        {
+            return new BsonDocument
+            {
+                {"pid_group",       int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())},
+                {"pupil_quantity",  int.Parse(dataGridView2.CurrentRow.Cells[1].Value.ToString())},
+                {"year_of_study",   int.Parse(dataGridView2.CurrentRow.Cells[2].Value.ToString())}
+            };
+        }
+        private BsonDocument GetNewParent()
+        {
+            return new BsonDocument
+            {
+                {"fid_student",     int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())},
+                {"p_surname",       dataGridView2.CurrentRow.Cells[1].Value.ToString()},
+                {"p_name",          dataGridView2.CurrentRow.Cells[2].Value.ToString()},
+                {"p_patronymic",    dataGridView2.CurrentRow.Cells[3].Value.ToString()},
+                {"phone_number",    decimal.Parse(dataGridView2.CurrentRow.Cells[4].Value.ToString())},
+                {"address",         dataGridView2.CurrentRow.Cells[5].Value.ToString()},
+            };
+        }
+        private BsonDocument GetNewCampus()
+        {
+            return new BsonDocument
+            {
+                {"pid_school",      int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())},
+                {"name",            dataGridView2.CurrentRow.Cells[1].Value.ToString()},
+                {"address",         dataGridView2.CurrentRow.Cells[2].Value.ToString()},
+            };
+        }
+        private BsonDocument GetNewStaff()
+        {
+            var работает = dataGridView2.CurrentRow.Cells[12].Value.ToString();
+            return new BsonDocument
+            {
+                {"pid_staff",       int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())},
+                {"fid_school",      int.Parse(dataGridView2.CurrentRow.Cells[1].Value.ToString())},
+                {"s_surname",       dataGridView2.CurrentRow.Cells[2].Value.ToString()},
+                {"s_name",          dataGridView2.CurrentRow.Cells[3].Value.ToString()},
+                {"s_patronymic",    dataGridView2.CurrentRow.Cells[4].Value.ToString()},
+                {"post",            dataGridView2.CurrentRow.Cells[5].Value.ToString()},
+                {"salary",          decimal.Parse(dataGridView2.CurrentRow.Cells[6].Value.ToString())},
+                {"date_of_birth",   DateTime.Parse(dataGridView2.CurrentRow.Cells[7].Value.ToString())},
+                {"address",         dataGridView2.CurrentRow.Cells[8].Value.ToString()},
+                {"phone_number",    decimal.Parse(dataGridView2.CurrentRow.Cells[9].Value.ToString())},
+                {"email",           dataGridView2.CurrentRow.Cells[10].Value.ToString()},
+                {"gender",          dataGridView2.CurrentRow.Cells[11].Value.ToString()},
+                {"active",          работает == "" ? false : bool.Parse(работает)},
+                {"description",     dataGridView2.CurrentRow.Cells[13].Value.ToString()},
+            };
+        }
+        private BsonDocument GetNewTeacher()
+        {
+            return new BsonDocument
+            {
+                {"fid_staff",       int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())},
+                {"fid_group",       int.Parse(dataGridView2.CurrentRow.Cells[1].Value.ToString())}
+            };
+        }
+        private BsonDocument GetNewStudent()
+        {
+            var комп = dataGridView2.CurrentRow.Cells[8].Value.ToString();
+            var pay = dataGridView2.CurrentRow.Cells[9].Value.ToString();
+            return new BsonDocument
+            {
+                {"pid_student",     int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())},
+                {"s_surname",       dataGridView2.CurrentRow.Cells[1].Value.ToString()},
+                {"s_name",          dataGridView2.CurrentRow.Cells[2].Value.ToString()},
+                {"s_patronymic",    dataGridView2.CurrentRow.Cells[3].Value.ToString()},
+                {"phone_number",    decimal.Parse(dataGridView2.CurrentRow.Cells[4].Value.ToString())},
+                {"date_of_birth",   DateTime.Parse(dataGridView2.CurrentRow.Cells[5].Value.ToString())},
+                {"description",     dataGridView2.CurrentRow.Cells[6].Value.ToString()},
+                {"gender",          dataGridView2.CurrentRow.Cells[7].Value.ToString()},
+                {"pc",              комп == "" ? false : bool.Parse(комп)},
+                {"payment",         pay == "" ? false : bool.Parse(pay)}
+            };
+        }
         
+        
+        private void Display()
+        {
+
+            switch (tab)
+            {
+                //Если выбрана таблица "classroom" в верхней таблице
+                case "classroom":
+                    {
+                        //то вызывается функция заполнения нижней таблицы данных
+                        DisplayClassroom();
+                        break;
+                    }
+                case "groups":
+                    {
+                        DisplayGroups();
+                        break;
+                    }
+                case "staff":
+                    {
+                        DisplayStaff();
+                        break;
+                    }
+                case "curriculum":
+                    {
+                        DisplayCurriculum();
+                        break;
+                    }
+                case "teachers":
+                    {
+                        DisplayTeachers();
+                        break;
+                    }
+                case "contract":
+                    {
+                        DisplayContract();
+                        break;
+                    }
+                case "student":
+                    {
+                        DisplayStudent();
+                        break;
+                    }
+                case "parents":
+                    {
+                        DisplayParents();
+                        break;
+                    }
+                case "equipement":
+                    {
+                        DisplayEquipement();
+                        break;
+                    }
+                case "school":
+                    {
+                        DisplaySchool();
+                        break;
+                    }
+                default:
+                    break;
+            }              
+        }
+
         //Действия при открытии окна
         private void MainForm_Load(object sender, EventArgs e)
         {
@@ -313,64 +554,8 @@ namespace it_School
                 if (e.Button == MouseButtons.Left)
                 {
                     var ht = dataGridView1.HitTest(e.X, e.Y);
-                    string tab = dataGridView1.Columns[ht.ColumnIndex].HeaderText;
-                    switch (tab)
-                    {
-                        //Если выбрана таблица "classroom" в верхней таблице
-                        case "classroom":
-                            {
-                                //то вызывается функция заполнения нижней таблицы данных
-                                DisplayClassroom();
-                                break;
-                            }
-                        case "groups":
-                            {
-                                DisplayGroups();
-                                break;
-                            }
-                        case "staff":
-                            {
-                                DisplayStaff();
-                                break;
-                            }
-                        case "curriculum":
-                            {
-                                DisplayCurriculum();
-                                break;
-                            }
-                        case "teachers":
-                            {
-                                DisplayTeachers();
-                                break;
-                            }
-                        case "contract":
-                            {
-                                DisplayContract();
-                                break;
-                            }
-                        case "student":
-                            {
-                                DisplayStudent();
-                                break;
-                            }
-                        case "parents":
-                            {
-                                DisplayParents();
-                                break;
-                            }
-                        //case "equipement":
-                        //    {
-                        //        DisplayEquipement();
-                        //        break;
-                        //    }
-                        //case "school":
-                        //    {
-                        //        DisplaySchool();
-                        //        break;
-                        //    }
-                        default:
-                            break;
-                    }
+                    tab = dataGridView1.Columns[ht.ColumnIndex].HeaderText;
+                    Display();
                 }
             }
             catch (Exception ex)
@@ -397,28 +582,68 @@ namespace it_School
         {
            
         }
-        //INSERT пока не работает
-        private void insert_button_Click(object sender, EventArgs e)
+        //INSERT работает, 
+        private async void insert_button_Click(object sender, EventArgs e)
         {
-            var student = new Student();
-            student.pid_student = int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString());
-            student.s_surname = dataGridView2.CurrentRow.Cells[1].Value.ToString();
-            student.s_name = dataGridView2.CurrentRow.Cells[2].Value.ToString();
-            student.s_patronymic = dataGridView2.CurrentRow.Cells[3].Value.ToString();
-            student.phone_number = long.Parse(dataGridView2.CurrentRow.Cells[4].Value.ToString());
-            student.date_of_birth = dataGridView2.CurrentRow.Cells[5].Value.ToString();
-            student.description = dataGridView2.CurrentRow.Cells[6].Value.ToString();
-            student.gender = dataGridView2.CurrentRow.Cells[7].Value.ToString();
-            student.pc = bool.Parse(dataGridView2.CurrentRow.Cells[8].Value.ToString());
-            student.payment = bool.Parse(dataGridView2.CurrentRow.Cells[9].Value.ToString());
+            switch (tab)
+            {
+                //Если выбрана таблица "classroom" в верхней таблице
+                case "classroom":
+                    {
+                        //то вызывается функция заполнения нижней таблицы данных
+                        await DBConnection.Students.InsertOneAsync(GetNewClassroom());
+                        break;
+                    }
+                case "groups":
+                    {
+                        await DBConnection.Students.InsertOneAsync(GetNewGroup());
+                        break;
+                    }
+                case "staff":
+                    {
+                        await DBConnection.Students.InsertOneAsync(GetNewStaff());
+                        break;
+                    }
+                case "curriculum":
+                    {
+                        await DBConnection.Students.InsertOneAsync(GetNewCurriculum());
+                        break;
+                    }
+                case "teachers":
+                    {
+                        await DBConnection.Students.InsertOneAsync(GetNewTeacher());
+                        break;
+                    }
+                case "contract":
+                    {
+                        await DBConnection.Students.InsertOneAsync(GetNewContract());
+                        break;
+                    }
+                case "student":
+                    {
+                        await DBConnection.Students.InsertOneAsync(GetNewStudent());
+                        break;
+                    }
+                case "parents":
+                    {
+                        await DBConnection.Students.InsertOneAsync(GetNewParent());
+                        break;
+                    }
+                case "equipement":
+                    {
+                        await DBConnection.Students.InsertOneAsync(GetNewEquipement());
+                        break;
+                    }
+                case "school":
+                    {
+                        await DBConnection.Students.InsertOneAsync(GetNewCampus());
+                        break;
+                    }
+                default:
+                    break;
+            }
 
-            var stream1 = new MemoryStream();
-            var ser = new DataContractJsonSerializer(typeof(Student));
-            ser.WriteObject(stream1, student);
-            stream1.Position = 0;
-            var sr = new StreamReader(stream1);
-            dataGridView1.DataSource = sr;
-            //await collection.InsertOneAsync(DBConnection.Students.==);
+            Display();
         }
     }
 }
