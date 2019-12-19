@@ -35,6 +35,7 @@
             this.insert_button = new System.Windows.Forms.Button();
             this.delete_button = new System.Windows.Forms.Button();
             this.search_button = new System.Windows.Forms.Button();
+            this.clear_button = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.SuspendLayout();
@@ -42,6 +43,7 @@
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Cursor = System.Windows.Forms.Cursors.Hand;
             this.dataGridView1.Location = new System.Drawing.Point(12, 12);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
@@ -62,10 +64,12 @@
             this.dataGridView2.Size = new System.Drawing.Size(1078, 557);
             this.dataGridView2.TabIndex = 1;
             this.dataGridView2.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.Update);
+            this.dataGridView2.CellErrorTextChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataTypeError);
             // 
             // comboBox1
             // 
             this.comboBox1.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.comboBox1.Cursor = System.Windows.Forms.Cursors.Hand;
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Location = new System.Drawing.Point(1099, 61);
             this.comboBox1.Name = "comboBox1";
@@ -79,12 +83,15 @@
             this.textBox1.AcceptsTab = true;
             this.textBox1.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.textBox1.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.textBox1.Cursor = System.Windows.Forms.Cursors.WaitCursor;
             this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.textBox1.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.textBox1.Location = new System.Drawing.Point(1099, 91);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(170, 27);
             this.textBox1.TabIndex = 3;
+            this.textBox1.UseWaitCursor = true;
+            this.textBox1.CursorChanged += new System.EventHandler(this.search_button_Click);
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // insert_button
@@ -109,26 +116,38 @@
             // 
             // search_button
             // 
-            this.search_button.Location = new System.Drawing.Point(1275, 61);
+            this.search_button.Location = new System.Drawing.Point(1100, 404);
             this.search_button.Name = "search_button";
             this.search_button.Size = new System.Drawing.Size(142, 52);
             this.search_button.TabIndex = 7;
             this.search_button.Text = "SEARCH";
             this.search_button.UseVisualStyleBackColor = true;
+            this.search_button.Visible = false;
             this.search_button.Click += new System.EventHandler(this.search_button_Click);
+            // 
+            // clear_button
+            // 
+            this.clear_button.Location = new System.Drawing.Point(1275, 91);
+            this.clear_button.Name = "clear_button";
+            this.clear_button.Size = new System.Drawing.Size(32, 27);
+            this.clear_button.TabIndex = 8;
+            this.clear_button.Text = "X";
+            this.clear_button.UseVisualStyleBackColor = true;
+            this.clear_button.Click += new System.EventHandler(this.clear_button_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1426, 631);
-            this.Controls.Add(this.search_button);
+            this.Controls.Add(this.clear_button);
             this.Controls.Add(this.delete_button);
             this.Controls.Add(this.insert_button);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.dataGridView2);
             this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.search_button);
             this.Name = "MainForm";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.MainForm_Load);
@@ -153,5 +172,6 @@
         private System.Windows.Forms.Button insert_button;
         private System.Windows.Forms.Button delete_button;
         private System.Windows.Forms.Button search_button;
+        private System.Windows.Forms.Button clear_button;
     }
 }

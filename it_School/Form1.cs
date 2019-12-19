@@ -550,8 +550,6 @@ namespace it_School
                     tab = dataGridView1.Columns[ht.ColumnIndex].HeaderText;
                     Display();
                     ComboBoxFill();
-                    ComboBoxFill();
-                    AutoComplete();
                     AutoComplete();
                 }
             }
@@ -562,8 +560,7 @@ namespace it_School
             ComboBoxFill();
         }
 
-        //Фильтрация таблицы и поиск элемента
-        private void search_button_Click(object sender, EventArgs e)
+        private void search()
         {
             try
             {
@@ -583,6 +580,12 @@ namespace it_School
             {
                 MessageBox.Show("Не найдено");
             }
+        }
+
+        //Фильтрация таблицы и поиск элемента
+        private void search_button_Click(object sender, EventArgs e)
+        {
+            search();
         }
 
         //Вставка происходит методом получения конкретного нового документа
@@ -651,82 +654,13 @@ namespace it_School
         //Удаление документа из БД
         private async void delete_button_Click(object sender, EventArgs e)
         {
-            switch (tab)
-            {
-                // удаление по значению первого элемента коллекции
-                case "classroom":
-                    {
-                        await DBConnection.Classroom.DeleteOneAsync(
-                            Builders<BsonDocument>.Filter.Eq(
-                                "pid_classroom", int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())));
-                        break;
-                    }
-                case "groups":
-                    {
-                        await DBConnection.Groups.DeleteOneAsync(
-                            Builders<BsonDocument>.Filter.Eq(
-                                "pid_group", int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())));
-                        break;
-                    }
-                case "staff":
-                    {
-                        await DBConnection.Staff.DeleteOneAsync(
-                            Builders<BsonDocument>.Filter.Eq(
-                                "pid_staff", int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())));
-                        break;
-                    }
-                case "curriculum":
-                    {
-                        await DBConnection.Curriculum.DeleteOneAsync(
-                            Builders<BsonDocument>.Filter.Eq(
-                                "pid_major", int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())));
-                        break;
-                    }
-                case "teachers":
-                    {
-                        await DBConnection.Teachers.DeleteOneAsync(
-                            Builders<BsonDocument>.Filter.Eq(
-                                "fid_staff", int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())));
-                        break;
-                    }
-                case "contract":
-                    {
-                        await DBConnection.Contract.DeleteOneAsync(
-                            Builders<BsonDocument>.Filter.Eq(
-                                "pid_contract", int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())));
-                        break;
-                    }
-                case "student":
-                    {
-                        await DBConnection.Students.DeleteOneAsync(
-                            Builders<BsonDocument>.Filter.Eq(
-                                "pid_student", int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())));
-                        break;
-                    }
-                case "parents":
-                    {
-                        await DBConnection.Parents.DeleteOneAsync(
-                            Builders<BsonDocument>.Filter.Eq(
-                                "fid_student", int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())));
-                        break;
-                    }
-                case "equipement":
-                    {
-                        await DBConnection.Equipement.DeleteOneAsync(
-                            Builders<BsonDocument>.Filter.Eq(
-                                "pid_inventory", int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())));
-                        break;
-                    }
-                case "school":
-                    {
-                        await DBConnection.Campus.DeleteOneAsync(
-                            Builders<BsonDocument>.Filter.Eq(
-                                "pid_school", int.Parse(dataGridView2.CurrentRow.Cells[0].Value.ToString())));
-                        break;
-                    }
-                default:
-                    break;
-            }
+            var collection = DBConnection.School.GetCollection<BsonDocument>(tab);
+            var current = dataGridView2.CurrentCell;
+            int index = current.RowIndex;
+            int _id = int.Parse(dataGridView2.Rows[index].Cells[0].Value.ToString());
+            string col = dataGridView2.Columns[0].HeaderText;
+
+            await collection.DeleteOneAsync(Builders<BsonDocument>.Filter.Eq(col, _id));
 
             Display();
         }
@@ -746,22 +680,81 @@ namespace it_School
         private new async void Update()
         {
             var collection = DBConnection.School.GetCollection<BsonDocument>(tab);
-            int index = dataGridView2.CurrentCell.ColumnIndex;
-            string pid = dataGridView2.CurrentRow.Cells[0].Value.ToString();
+            var current = dataGridView2.CurrentCell;
+            int index = current.ColumnIndex;
+            string _id = dataGridView2.CurrentRow.Cells[0].Value.ToString();
             string col = dataGridView2.Columns[0].Name.ToString();
-            var result = await collection.UpdateOneAsync(
-                new BsonDocument(col, int.Parse(pid)),
-                new BsonDocument("$set", new BsonDocument(dataGridView2.Columns[index].Name.ToString(), dataGridView2.CurrentCell.Value.ToString())));
+            if (current.OwningColumn.ValueType == current.ValueType)
+            {
+                if (int.TryParse(current.Value.ToString(), out int data))
+                {
+                    await collection.UpdateOneAsync(
+                    Builders<BsonDocument>.Filter.Eq(col, int.Parse(_id)),
+                            Builders<BsonDocument>.Update.Set(dataGridView2.Columns[index].Name.ToString(), data));
+                }
+                else if (bool.TryParse(current.Value.ToString(), out bool datab))
+                {
+                    await collection.UpdateOneAsync(
+                         Builders<BsonDocument>.Filter.Eq(col, int.Parse(_id)),
+                            Builders<BsonDocument>.Update.Set(dataGridView2.Columns[index].Name.ToString(), datab));
+                }
+                else if (DateTime.TryParse(current.Value.ToString(), out DateTime date))
+                {
+                    await collection.UpdateOneAsync(
+                         Builders<BsonDocument>.Filter.Eq(col, int.Parse(_id)),
+                            Builders<BsonDocument>.Update.Set(dataGridView2.Columns[index].Name.ToString(), date));
+                }
+                else if (decimal.TryParse(current.Value.ToString(), out decimal dec))
+                {
+                    await collection.UpdateOneAsync(
+                         Builders<BsonDocument>.Filter.Eq(col, int.Parse(_id)),
+                            Builders<BsonDocument>.Update.Set(dataGridView2.Columns[index].Name.ToString(), dec));
+                }
+                else
+                {
+                    string str = dataGridView2.CurrentCell.Value.ToString();
+                    await collection.UpdateOneAsync(
+                         Builders<BsonDocument>.Filter.Eq(col, int.Parse(_id)),
+                            Builders<BsonDocument>.Update.Set(dataGridView2.Columns[index].Name.ToString(), str));
+                }
+
+            }
+            else throw new FormatException();
+
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            AutoComplete();
+            search();
         }
 
         private void Update(object sender, DataGridViewCellEventArgs e)
         {
-            Update();
+            try
+            {
+                Update();
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Ошибка типов");
+            }
+        }
+
+        private void Display(object sender, EventArgs e)
+        {
+            Display();
+        }
+
+        private void DataTypeError(object sender, DataGridViewCellEventArgs e)
+        {
+            MessageBox.Show("Ошибка типов");
+            
+        }
+
+        private void clear_button_Click(object sender, EventArgs e)
+        {
+            textBox1.Clear();
+
         }
     }
 }

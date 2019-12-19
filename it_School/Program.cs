@@ -17,6 +17,7 @@ namespace it_School
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm());
+            
         }
     }
 }
