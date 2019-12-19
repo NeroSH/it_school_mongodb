@@ -469,7 +469,6 @@ namespace it_School
             };
         }
 
-
         private void Display()
         {
 
@@ -532,6 +531,14 @@ namespace it_School
             }
         }
 
+        private void ComboBoxFill()
+        {
+            comboBox1.Items.Clear();
+            for (int i = 0; i < dataGridView2.Columns.Count; i++)
+            {
+                comboBox1.Items.Add(dataGridView2.Columns[i].Name);
+            }
+        }
         //Действия при открытии окна
         private void MainForm_Load(object sender, EventArgs e)
         {
@@ -556,21 +563,44 @@ namespace it_School
                     var ht = dataGridView1.HitTest(e.X, e.Y);
                     tab = dataGridView1.Columns[ht.ColumnIndex].HeaderText;
                     Display();
+                    ComboBoxFill();
+                    ComboBoxFill();
+                    AutoComplete();
+                    AutoComplete();
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Display Data Error: " + ex);
             }
+            ComboBoxFill();
         }
         private void search_button_Click(object sender, EventArgs e)
         {
+            try
+            {
+                if (int.TryParse(textBox1.Text, out int userVal))
+                {
+                    (dataGridView2.DataSource as DataTable).DefaultView.RowFilter =
+                        string.Format("[{1}] = {0}", userVal, comboBox1.Text);
+                }
+                else
+                {
+                    (dataGridView2.DataSource as DataTable).DefaultView.RowFilter =
+                        string.Format("[{1}] like '{0}%'", textBox1.Text, comboBox1.Text);
+                }
 
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Не найдено");
+                // MessageBox.Show(ex.ToString());
+            }
         }
 
         private void update_button_Click(object sender, EventArgs e)
         {
-
+           
         }
 
         private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -726,6 +756,25 @@ namespace it_School
             }
 
             Display();
+        }
+        private void ComboBoxFill(object sender, EventArgs e)
+        {
+            ComboBoxFill();
+        }
+        internal void AutoComplete()
+        {
+            AutoCompleteStringCollection Collection = new AutoCompleteStringCollection();
+            for (int i = 0; i < dataGridView2.Rows.Count - 1; i++)
+                for (int j = 0; j < dataGridView2.Columns.Count; j++)
+                     Collection.Add(dataGridView2.Rows[i].Cells[j].Value.ToString());
+            textBox1.AutoCompleteCustomSource = Collection;
+        }
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
         }
     }   
 }
