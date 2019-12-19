@@ -575,6 +575,8 @@ namespace it_School
             }
             ComboBoxFill();
         }
+        
+        //SEARCH работает
         private void search_button_Click(object sender, EventArgs e)
         {
             try
@@ -594,7 +596,6 @@ namespace it_School
             catch (Exception)
             {
                 MessageBox.Show("Не найдено");
-                // MessageBox.Show(ex.ToString());
             }
         }
 
