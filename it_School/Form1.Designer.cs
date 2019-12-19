@@ -32,7 +32,6 @@
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
-            this.update_button = new System.Windows.Forms.Button();
             this.insert_button = new System.Windows.Forms.Button();
             this.delete_button = new System.Windows.Forms.Button();
             this.search_button = new System.Windows.Forms.Button();
@@ -49,7 +48,6 @@
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.Size = new System.Drawing.Size(1405, 24);
             this.dataGridView1.TabIndex = 0;
-            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             this.dataGridView1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dataGridView1_MouseDown);
             // 
             // dataGridView2
@@ -63,7 +61,7 @@
             this.dataGridView2.RowTemplate.Height = 50;
             this.dataGridView2.Size = new System.Drawing.Size(1078, 557);
             this.dataGridView2.TabIndex = 1;
-            this.dataGridView2.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellContentClick);
+            this.dataGridView2.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.Update);
             // 
             // comboBox1
             // 
@@ -73,7 +71,6 @@
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(170, 24);
             this.comboBox1.TabIndex = 2;
-            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             this.comboBox1.Click += new System.EventHandler(this.ComboBoxFill);
             // 
             // textBox1
@@ -89,16 +86,6 @@
             this.textBox1.Size = new System.Drawing.Size(170, 27);
             this.textBox1.TabIndex = 3;
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
-            // 
-            // update_button
-            // 
-            this.update_button.Location = new System.Drawing.Point(1100, 138);
-            this.update_button.Name = "update_button";
-            this.update_button.Size = new System.Drawing.Size(142, 43);
-            this.update_button.TabIndex = 4;
-            this.update_button.Text = "UPDATE";
-            this.update_button.UseVisualStyleBackColor = true;
-            this.update_button.Click += new System.EventHandler(this.update_button_Click);
             // 
             // insert_button
             // 
@@ -138,7 +125,6 @@
             this.Controls.Add(this.search_button);
             this.Controls.Add(this.delete_button);
             this.Controls.Add(this.insert_button);
-            this.Controls.Add(this.update_button);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.dataGridView2);
@@ -164,7 +150,6 @@
         private System.Windows.Forms.DataGridView dataGridView2;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button update_button;
         private System.Windows.Forms.Button insert_button;
         private System.Windows.Forms.Button delete_button;
         private System.Windows.Forms.Button search_button;

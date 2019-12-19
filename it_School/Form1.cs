@@ -1,14 +1,8 @@
-﻿using System;
-using System.Data;
-using System.IO;
-using System.Runtime.Serialization.Json;
-using System.Windows.Forms;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Bson.Serialization;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.ComponentModel;
+using System;
+using System.Data;
+using System.Windows.Forms;
 
 namespace it_School
 {
@@ -21,7 +15,7 @@ namespace it_School
             InitializeComponent();
         }
         //
-        // Методы для отображения элементов таблиц
+        // Методы Display... для отображения элементов таблиц
         //
         private async void DisplayClassroom()
         {
@@ -47,7 +41,6 @@ namespace it_School
                 dataGridView2.DataSource = data;
             }
         }
-
         private async void DisplayGroups()
         {
             DataTable data = new DataTable();
@@ -74,7 +67,6 @@ namespace it_School
                 dataGridView2.DataSource = data;
             }
         }
-
         private async void DisplayStaff()
         {
             DataTable data = new DataTable();
@@ -124,7 +116,6 @@ namespace it_School
                 dataGridView2.DataSource = data;
             }
         }
-
         private async void DisplayCurriculum()
         {
             DataTable data = new DataTable();
@@ -153,7 +144,6 @@ namespace it_School
                 dataGridView2.DataSource = data;
             }
         }
-
         private async void DisplayTeachers()
         {
             DataTable data = new DataTable();
@@ -178,7 +168,6 @@ namespace it_School
                 dataGridView2.DataSource = data;
             }
         }
-
         private async void DisplayContract()
         {
             DataTable data = new DataTable();
@@ -216,7 +205,6 @@ namespace it_School
                 dataGridView2.DataSource = data;
             }
         }
-
         private async void DisplayStudent()
         {
             DataTable data = new DataTable();
@@ -258,7 +246,6 @@ namespace it_School
                 dataGridView2.DataSource = data;
             }
         }
-
         private async void DisplayParents()
         {
             DataTable data = new DataTable();
@@ -292,7 +279,6 @@ namespace it_School
                 dataGridView2.DataSource = data;
             }
         }
-
         private async void DisplayEquipement()
         {
             DataTable data = new DataTable();
@@ -348,7 +334,7 @@ namespace it_School
             }
         }
 
-        //Добавление документов в таблицу
+        //Получение документа с заполенными полями для вставки
         private BsonDocument GetNewClassroom()
         {
             return new BsonDocument
@@ -531,14 +517,6 @@ namespace it_School
             }
         }
 
-        private void ComboBoxFill()
-        {
-            comboBox1.Items.Clear();
-            for (int i = 0; i < dataGridView2.Columns.Count; i++)
-            {
-                comboBox1.Items.Add(dataGridView2.Columns[i].Name);
-            }
-        }
         //Действия при открытии окна
         private void MainForm_Load(object sender, EventArgs e)
         {
@@ -551,9 +529,17 @@ namespace it_School
                 dataGridView1.Columns[it++].Name = name;
             }
         }
+        private void ComboBoxFill()
+        {
+            comboBox1.Items.Clear();
+            for (int i = 0; i < dataGridView2.Columns.Count; i++)
+            {
+                comboBox1.Items.Add(dataGridView2.Columns[i].Name);
+            }
+        }
 
-        //После нажания на название таблицы, вызываются функция заполнения таблицы данных
-        //соответствующая названию таблицы
+        //После нажания на название коллекции, вызываются функция заполнения таблицы данных
+        //соответствующая названию таблицы в БД
         private void dataGridView1_MouseDown(object sender, MouseEventArgs e)
         {
             try
@@ -575,8 +561,8 @@ namespace it_School
             }
             ComboBoxFill();
         }
-        
-        //SEARCH работает
+
+        //Фильтрация таблицы и поиск элемента
         private void search_button_Click(object sender, EventArgs e)
         {
             try
@@ -599,22 +585,8 @@ namespace it_School
             }
         }
 
-        private void update_button_Click(object sender, EventArgs e)
-        {
-           
-        }
-
-        private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-        
-        //INSERT работает 
+        //Вставка происходит методом получения конкретного нового документа
+        //который записывается в БД
         private async void insert_button_Click(object sender, EventArgs e)
         {
             switch (tab)
@@ -675,8 +647,8 @@ namespace it_School
 
             Display();
         }
-        
-        //DELETE работает
+
+        //Удаление документа из БД
         private async void delete_button_Click(object sender, EventArgs e)
         {
             switch (tab)
@@ -762,21 +734,35 @@ namespace it_School
         {
             ComboBoxFill();
         }
+        // Выпадающий список, не совсем работает
         internal void AutoComplete()
         {
             AutoCompleteStringCollection Collection = new AutoCompleteStringCollection();
             for (int i = 0; i < dataGridView2.Rows.Count - 1; i++)
                 for (int j = 0; j < dataGridView2.Columns.Count; j++)
-                     Collection.Add(dataGridView2.Rows[i].Cells[j].Value.ToString());
+                    Collection.Add(dataGridView2.Rows[i].Cells[j].Value.ToString());
             textBox1.AutoCompleteCustomSource = Collection;
         }
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private new async void Update()
         {
+            var collection = DBConnection.School.GetCollection<BsonDocument>(tab);
+            int index = dataGridView2.CurrentCell.ColumnIndex;
+            string pid = dataGridView2.CurrentRow.Cells[0].Value.ToString();
+            string col = dataGridView2.Columns[0].Name.ToString();
+            var result = await collection.UpdateOneAsync(
+                new BsonDocument(col, int.Parse(pid)),
+                new BsonDocument("$set", new BsonDocument(dataGridView2.Columns[index].Name.ToString(), dataGridView2.CurrentCell.Value.ToString())));
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
+            AutoComplete();
         }
-    }   
+
+        private void Update(object sender, DataGridViewCellEventArgs e)
+        {
+            Update();
+        }
+    }
 }
-    
+
